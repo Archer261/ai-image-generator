@@ -1,3 +1,4 @@
 import preview from './preview.png'
+import download from './download.png'
 
-export { preview };
+export { preview, download };

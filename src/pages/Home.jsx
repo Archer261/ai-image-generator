@@ -3,9 +3,9 @@ import { Card, FormField, Loader } from '../components'
 
 const RenderCards = ({ data, title }) => {
     if (data?.length > 0) {
-        return data.map((post) => {
-            <Card key={post._id} {...post} />
-        })
+        return (data.map((post) =>
+            <Card key={post._id} {...post} />)
+        );
     }
     return (
         <h2 className='mt-5 font-bold text-xl uppercase'>
@@ -19,6 +19,8 @@ const Home = () => {
     const [loading, setLoading] = useState(false)
     const [allPosts, setAllPosts] = useState(null)
     const [searchText, setSearchText] = useState('')
+    const [searchedResults, setSearchedResults] = useState(null);
+    const [searchTimeout, setSearchTimeout] = useState(null)
 
     useEffect(() => {
         const fetchPosts = async () => {
@@ -47,6 +49,17 @@ const Home = () => {
         fetchPosts();
     }, []);
 
+    const handleSearchChange = (e) => {
+        setSearchText(e.target.value);
+        setSearchTimeout(
+            setTimeout(() => {
+                const searchedResults = allPosts.filter((item) => item.name.toLowerCase().includes(searchText.toLowerCase()) || item.prompt.toLowerCase().toLowerCase().includes(searchText.toLowerCase()));
+
+                setSearchedResults(searchedResults)
+            }, 500)
+        );
+    }
+
     console.log(allPosts)
     return (
         <section className='max-w-7xl mx-auto'>
@@ -58,7 +71,14 @@ const Home = () => {
 
             </div>
             <div className='mt-16'>
-                <FormField />
+                <FormField
+                    labelName='Search posts'
+                    type='text'
+                    name='text'
+                    placeholder='Search posts'
+                    value={searchText}
+                    handleChange={handleSearchChange}
+                />
             </div>
 
             <div className='mt-10'>
@@ -78,7 +98,7 @@ const Home = () => {
 
                         <div className='grid lg:grid-cols-4 sm:grid-cols-3 xs:grid-cols-2 grid-cols-1 gap-3'>
                             {searchText ? (
-                                <RenderCards data={[]} title='No search results found' />
+                                <RenderCards data={searchedResults} title='No search results found' />
                             ) : (
                                 <RenderCards data={allPosts} title='No posts found' />
                             )}
